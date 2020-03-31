@@ -6,19 +6,38 @@ import java.io.StringReader;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 
+/**
+ * class to hold DNA or genetic information of a virus, living being, etc
+ * 
+ * @author Zayed
+ *
+ */
 public class Genome {
 
-	private String fullName, name;
-	private String geneticCode = "";
-	private String translation = "";
-	private boolean isDNA = true;
+	private String fullName, name; // names of the target (virus or living being)
+	private String geneticCode = ""; // the DNA or RNA
+	private String translation = ""; // the translation into a protein
+	private boolean isDNA = true; // if it's DNA or RNA
 
-	public Genome(String name) {
+	/**
+	 * Constructor
+	 * 
+	 * @param name  -> name of the target, should be the name on the file containing
+	 *              the genetic material
+	 * @param table -> the codon table with respective amino acids for translation
+	 */
+	public Genome(String name, CodonHashTable table) {
 		this.name = name;
 
-		loadGeneticCode(name);
+		loadGeneticCode(name); // load it from file
+		translate(table); // translate it
 	}
 
+	/**
+	 * load genetic code form file with same name as the target
+	 * 
+	 * @param fileName -> name of the target and file
+	 */
 	private void loadGeneticCode(String fileName) {
 		String filePath = "res/genome_data/" + fileName + ".txt";
 		String data = fileToString(filePath);
@@ -29,7 +48,7 @@ public class Genome {
 		if ((line = nextLineOfBuffer(reader)) != null)
 			fullName = line;
 
-		// get genetic material type from second line
+		// get genetic material type (DNA or RNA) from second line
 		if ((line = nextLineOfBuffer(reader)) != null)
 			isDNA = line.equals("DNA");
 
@@ -45,10 +64,15 @@ public class Genome {
 			geneticCode += newData.replace(" ", "");
 		}
 
-//		System.out.println(geneticCode);
-
 	}
 
+	/**
+	 * get next line from the BufferdReader that is reading the string with the
+	 * codon table
+	 * 
+	 * @param reader -> reader that is reading the string
+	 * @return the next line as a string
+	 */
 	private String nextLineOfBuffer(BufferedReader reader) {
 		try {
 			return reader.readLine();
@@ -57,6 +81,13 @@ public class Genome {
 		}
 		return null;
 	}
+
+	/**
+	 * convert the entire file in a string
+	 * 
+	 * @param fileName -> name of the file on the computer
+	 * @return the file content as a string
+	 */
 
 	private String fileToString(String fileName) {
 		String data = "";
@@ -96,7 +127,12 @@ public class Genome {
 		return translation;
 	}
 
-	public boolean translate(CodonHashTable table) {
+	/**
+	 * translate genetic material to amino acids (a protein)
+	 * 
+	 * @param table -> codon table to provide respective amino acids
+	 */
+	private void translate(CodonHashTable table) {
 
 		int length = geneticCode.length();
 		for (int i = 0; i < length - 3; i += 3) {
@@ -109,9 +145,6 @@ public class Genome {
 			String protein = table.get(codon);
 			translation += protein + "-";
 		}
-
-//		System.out.println(translation);
-		return true;
 	}
 
 }

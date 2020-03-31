@@ -7,72 +7,111 @@ import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.HashMap;
 
+/**
+ * The class to hold the codon table and it's properties
+ * 
+ * @author Zayed
+ *
+ */
 public class CodonHashTable {
 
+	// string version of the codon tables
 	private String halfTableStr;
 	private String fullTableStr;
 	private String compressedTableStr;
 
-	private boolean compressed;
-	private boolean half;
+	private boolean compressed; // the amino acids names are compressed to 1 letter
+	private boolean half; // the amino acids names are compressed to 3 letter
 
+	// fast retrieval of the amino acids of all 64 possible codons
 	private HashMap<String, String> halfTable;
 	private HashMap<String, String> fullTable;
 	private HashMap<String, String> compressedTable;
 
+	/**
+	 * Constructor
+	 */
 	public CodonHashTable() {
+		// setup hash maps
 		setupHalfTable();
 		setupFullTable();
 		setupCompressedTable();
 
-//		printTableToConsole();
+		setToHalfTable(); // default setting at short names amino acids
 	}
 
+	/**
+	 * setup the hash map for 3 letter amino acids, half names
+	 */
 	private void setupHalfTable() {
 		halfTableStr = fileToString("res/codon_table/codontable_half.txt");
 		halfTable = populate(halfTableStr);
-
-//		System.out.println(halfTable);
-
 	}
 
+	/**
+	 * setup the hash map for complete named amino acids
+	 */
 	private void setupFullTable() {
 		fullTableStr = fileToString("res/codon_table/codontable_full.txt");
 		fullTable = populate(fullTableStr);
-
-//		System.out.println(fullTable);
 	}
 
+	/**
+	 * setup the hash map for 1 letter amino acids, compressed names
+	 */
 	private void setupCompressedTable() {
 		compressedTableStr = fileToString("res/codon_table/codontable_compressed.txt");
 		compressedTable = populate(compressedTableStr);
-
-//		System.out.println(compressedTable);
 	}
 
-	private String getAminoAcid(String s) {
-		return s.substring(4);
-	}
-
+	/**
+	 * get the codon from the line, should be after the first 3 letters
+	 * 
+	 * @param s -> the line we want to extract the codon from
+	 * @return the codon sequence as a string
+	 */
 	private String getCodon(String s) {
 		return s.substring(0, 3);
 	}
 
+	/**
+	 * get the amino acid from the line, should be after the codon and the ':'
+	 * 
+	 * @param s -> the line we want to extract the amino acid from
+	 * @return the amino acid name as a string
+	 */
+	private String getAminoAcid(String s) {
+		return s.substring(4);
+	}
+
+	/**
+	 * populate the hash maps for the codons
+	 * 
+	 * @param data -> the string with the codon table from the text files
+	 * @return the hashmap codon table
+	 */
 	private HashMap<String, String> populate(String data) {
 		BufferedReader reader = new BufferedReader(new StringReader(data));
 		HashMap<String, String> table = new HashMap<String, String>();
-		String line = "";
 
+		String line;
 		while ((line = nextLineOfBuffer(reader)) != null) {
 			String codon = getCodon(line);
 			String aminoAcid = getAminoAcid(line);
 
-			table.put(codon, aminoAcid);
+			table.put(codon, aminoAcid); // add codon as the key and amino acid as the value in the hashmap
 		}
 
 		return table;
 	}
 
+	/**
+	 * get next line from the BufferdReader that is reading the string with the
+	 * codon table
+	 * 
+	 * @param reader -> reader that is reading the string
+	 * @return the next line as a string
+	 */
 	private String nextLineOfBuffer(BufferedReader reader) {
 		try {
 			return reader.readLine();
@@ -82,6 +121,12 @@ public class CodonHashTable {
 		return null;
 	}
 
+	/**
+	 * convert the entire file in a string
+	 * 
+	 * @param fileName -> name of the file on the computer
+	 * @return the file content as a string
+	 */
 	private String fileToString(String fileName) {
 		String data = "";
 		try {
@@ -92,21 +137,33 @@ public class CodonHashTable {
 		return data;
 	}
 
+	/**
+	 * set the table to half named amino acids (3 letters)
+	 */
 	public void setToHalfTable() {
 		compressed = false;
 		half = true;
 	}
 
+	/**
+	 * set the table to fully named amino acids (all letters)
+	 */
 	public void setToFullTable() {
 		compressed = false;
 		half = false;
 	}
 
+	/**
+	 * set the table to compressed names of amino acids (1 letter)
+	 */
 	public void setToCompressedTable() {
 		compressed = true;
 		half = false;
 	}
 
+	/**
+	 * print table to console with all amino acid naming settings
+	 */
 	public void printTableToConsole() {
 		String[] keys = halfTable.keySet().toArray(new String[0]);
 		for (int i = 0; i < keys.length; i++) {
@@ -120,6 +177,12 @@ public class CodonHashTable {
 		}
 	}
 
+	/**
+	 * return the appropriate amino acid for the key (codon)
+	 * 
+	 * @param key -> the codon in the RNA sequence
+	 * @return the amino acid as a string
+	 */
 	public String get(String key) {
 		if (compressed) {
 			return compressedTable.get(key);
