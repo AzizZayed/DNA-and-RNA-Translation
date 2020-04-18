@@ -148,7 +148,7 @@ public class Genome {
 		String name = corona.getName();
 		String translation = corona.getTranslation();
 
-		System.out.println("Protein sequence of " + fname + ". Officially named " + name + ":");
+		System.out.println("Amino Acid sequence of " + fname + ". Officially named " + name + ":");
 		System.out.println(translation);
 	}
 }
