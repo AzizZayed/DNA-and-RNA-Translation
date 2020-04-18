@@ -15,11 +15,6 @@ import java.util.HashMap;
  */
 public class CodonHashTable {
 
-	// string version of the codon tables
-	private String halfTableStr;
-	private String fullTableStr;
-	private String compressedTableStr;
-
 	private boolean compressed; // the amino acids names are compressed to 1 letter
 	private boolean half; // the amino acids names are compressed to 3 letter
 
@@ -44,7 +39,7 @@ public class CodonHashTable {
 	 * setup the hash map for 3 letter amino acids, half names
 	 */
 	private void setupHalfTable() {
-		halfTableStr = fileToString("res/codon_table/codontable_half.txt");
+		String halfTableStr = fileToString("res/codon_table/codontable_half.txt");
 		halfTable = populate(halfTableStr);
 	}
 
@@ -52,7 +47,7 @@ public class CodonHashTable {
 	 * setup the hash map for complete named amino acids
 	 */
 	private void setupFullTable() {
-		fullTableStr = fileToString("res/codon_table/codontable_full.txt");
+		String fullTableStr = fileToString("res/codon_table/codontable_full.txt");
 		fullTable = populate(fullTableStr);
 	}
 
@@ -60,34 +55,14 @@ public class CodonHashTable {
 	 * setup the hash map for 1 letter amino acids, compressed names
 	 */
 	private void setupCompressedTable() {
-		compressedTableStr = fileToString("res/codon_table/codontable_compressed.txt");
+		String compressedTableStr = fileToString("res/codon_table/codontable_compressed.txt");
 		compressedTable = populate(compressedTableStr);
-	}
-
-	/**
-	 * get the codon from the line, should be after the first 3 letters
-	 * 
-	 * @param s -> the line we want to extract the codon from
-	 * @return the codon sequence as a string
-	 */
-	private String getCodon(String s) {
-		return s.substring(0, 3);
-	}
-
-	/**
-	 * get the amino acid from the line, should be after the codon and the ':'
-	 * 
-	 * @param s -> the line we want to extract the amino acid from
-	 * @return the amino acid name as a string
-	 */
-	private String getAminoAcid(String s) {
-		return s.substring(4);
 	}
 
 	/**
 	 * populate the hash maps for the codons
 	 * 
-	 * @param data -> the string with the codon table from the text files
+	 * @param data - the string with the codon table from the text files
 	 * @return the hashmap codon table
 	 */
 	private HashMap<String, String> populate(String data) {
@@ -96,45 +71,13 @@ public class CodonHashTable {
 
 		String line;
 		while ((line = nextLineOfBuffer(reader)) != null) {
-			String codon = getCodon(line);
-			String aminoAcid = getAminoAcid(line);
+			String codon = line.substring(0, 3);// get the codon from the line, should be after the first 3 letters
+			String aminoAcid = line.substring(4);// get the amino acid from line, should be after the codon and the ':'
 
 			table.put(codon, aminoAcid); // add codon as the key and amino acid as the value in the hashmap
 		}
 
 		return table;
-	}
-
-	/**
-	 * get next line from the BufferdReader that is reading the string with the
-	 * codon table
-	 * 
-	 * @param reader -> reader that is reading the string
-	 * @return the next line as a string
-	 */
-	private String nextLineOfBuffer(BufferedReader reader) {
-		try {
-			return reader.readLine();
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-		return null;
-	}
-
-	/**
-	 * convert the entire file in a string
-	 * 
-	 * @param fileName -> name of the file on the computer
-	 * @return the file content as a string
-	 */
-	private String fileToString(String fileName) {
-		String data = "";
-		try {
-			data = new String(Files.readAllBytes(Paths.get(fileName)));
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-		return data;
 	}
 
 	/**
@@ -162,6 +105,38 @@ public class CodonHashTable {
 	}
 
 	/**
+	 * convert the entire file in a string
+	 * 
+	 * @param fileName - name of the file on the computer
+	 * @return the file content as a string
+	 */
+	private String fileToString(String fileName) {
+		String data = "";
+		try {
+			data = new String(Files.readAllBytes(Paths.get(fileName)));
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		return data;
+	}
+
+	/**
+	 * get next line from the BufferdReader that is reading the string with the
+	 * codon table
+	 * 
+	 * @param reader - reader that is reading the string
+	 * @return the next line as a string
+	 */
+	private String nextLineOfBuffer(BufferedReader reader) {
+		try {
+			return reader.readLine();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		return null;
+	}
+
+	/**
 	 * print table to console with all amino acid naming settings
 	 */
 	public void printTableToConsole() {
@@ -180,7 +155,7 @@ public class CodonHashTable {
 	/**
 	 * return the appropriate amino acid for the key (codon)
 	 * 
-	 * @param key -> the codon in the RNA sequence
+	 * @param key - the codon in the RNA sequence
 	 * @return the amino acid as a string
 	 */
 	public String get(String key) {
